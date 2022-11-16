@@ -65,7 +65,6 @@ def read_file(filename):
         reader = csv.DictReader(csvfile, delimiter = ';')
         for row in reader :
             l.append(dict(row))
-    #print(l)
     return l
 
 
@@ -119,14 +118,7 @@ def build_list_departements(data):
     """
     # votre code ici
 
-    l = []
-    departement = {(dico["Code Officiel Département"], dico["Nom Officiel Département"]) for dico in data if dico["Nom Officiel Département"] != ""}
-
-    l = sorted(departement)
-
-    #print(l)
-
-    return l
+    return sorted({(dico["Code Officiel Département"], dico["Nom Officiel Département"]) for dico in data if dico["Nom Officiel Département"] != ""})
 
 
 def build_list_communes(data):
@@ -176,12 +168,8 @@ def build_list_communes(data):
     [('97502', 'Saint-Pierre'), ('97701', 'Saint-Barthélemy'), ('97801', 'Saint-Martin')]
     """
     # votre code ici
-    l = []
-
     
-
-    return l
-
+    return sorted({(value["Code Officiel Commune / Arrondissement Municipal"], value["Nom Officiel Commune / Arrondissement Municipal"]) for value in data if value["Nom Officiel Commune / Arrondissement Municipal"] != ""})
 
 def get_pop_commune(data, code):
     """retourne la population totale d'une commune pour l'année de recensement la plus récente
@@ -216,10 +204,15 @@ def get_pop_commune(data, code):
     
     """
     # votre code ici
-    t = (None, None, None)
-
+    
+    #return sorted({(value["Nom Officiel Commune / Arrondissement Municipal"], value["Population totale"], value["Année de recensement"]) for value in data if value["Nom Officiel Commune / Arrondissement Municipal"] == value[code]})
+    #return ( (value["Nom Officiel Commune / Arrondissement Municipal"], value["Population totale"], value["Année de recensement"]) for value in data if value["Nom Officiel Commune / Arrondissement Municipal"] == code)
+    t = (None,None,None)
+    for value in data :
+        if(value["Nom Officiel Commune / Arrondissement Municipal"]==code):
+            t = (value["Nom Officiel Commune / Arrondissement Municipal"], value["Population totale"], value["Année de recensement"])
+            break
     return t
-
 
 def multi_dict(K, type):
     if K == 1:
@@ -312,8 +305,8 @@ def main():
     # Exemples d'appels
     data = read_file(FILENAME)
     l = build_list_departements(data)
-    # c = build_list_communes(data)
-    # p = get_pop_commune(data, '39124')
+    c = build_list_communes(data)
+    p = get_pop_commune(data, '39124')
     # d = build_dict_departements(data)
     # s = stat_by_dpt(d, '77')
 
@@ -321,8 +314,8 @@ def main():
 # Ne pas modifier le code ci-dessous
 if __name__ == '__main__':
     dt = True
-    # dt = not dt
+    dt = not dt
     if dt:
-        doctest.run_docstring_examples(read_file, globals(), verbose=True)
+        doctest.run_docstring_examples(get_pop_commune, globals(), verbose=True)
     else:
         main()
